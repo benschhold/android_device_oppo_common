@@ -67,6 +67,16 @@ public class Startup extends BroadcastReceiver {
                             " failed while restoring saved preference values");
                     }
                 }
+
+                if (hasTristateSwitch()) {
+                    int keyCode_slider_top = Constants.getPreferenceInteger(context, "keycode_slider_top", 0);
+                    int keyCode_slider_middle = Constants.getPreferenceInteger(context, "keycode_slider_middle", 1);
+                    int keyCode_slider_bottom = Constants.getPreferenceInteger(context, "keycode_slider_bottom", 2);
+                    FileUtils.writeLine(Constants.KEYCODE_SLIDER_TOP, String.valueOf(keyCode_slider_top + 600));
+                    FileUtils.writeLine(Constants.KEYCODE_SLIDER_MIDDLE, String.valueOf(keyCode_slider_middle + 600));
+                    FileUtils.writeLine(Constants.KEYCODE_SLIDER_BOTTOM, String.valueOf(keyCode_slider_bottom + 600));
+                }
+
             }
 
             // Disable backtouch settings if needed
@@ -172,6 +182,12 @@ public class Startup extends BroadcastReceiver {
 
     private static boolean hasOClick() {
         return Build.MODEL.equals("N1") || Build.MODEL.equals("N3");
+    }
+
+    public static boolean hasTristateSwitch() {
+        return new File(Constants.KEYCODE_SLIDER_TOP).exists()
+                && new File(Constants.KEYCODE_SLIDER_MIDDLE).exists()
+                && new File(Constants.KEYCODE_SLIDER_BOTTOM).exists();
     }
 
     private void updateOClickServiceState(Context context) {

@@ -43,6 +43,7 @@ import android.os.UserHandle;
 import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.provider.Settings.Global;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.WindowManagerGlobal;
@@ -70,6 +71,9 @@ public class KeyHandler implements DeviceKeyHandler {
     private static final int GESTURE_V_SCANCODE = 252;
     private static final int GESTURE_LTR_SCANCODE = 253;
     private static final int GESTURE_GTR_SCANCODE = 254;
+    private static final int MODE_MUTE = 600;
+    private static final int MODE_DO_NOT_DISTURB = 601;
+    private static final int MODE_NORMAL = 602;
 
     private static final int GESTURE_WAKELOCK_DURATION = 3000;
 
@@ -79,7 +83,10 @@ public class KeyHandler implements DeviceKeyHandler {
         GESTURE_SWIPE_DOWN_SCANCODE,
         GESTURE_V_SCANCODE,
         GESTURE_LTR_SCANCODE,
-        GESTURE_GTR_SCANCODE
+        GESTURE_GTR_SCANCODE,
+        MODE_MUTE,
+        MODE_DO_NOT_DISTURB,
+        MODE_NORMAL
     };
 
     private final Context mContext;
@@ -96,6 +103,7 @@ public class KeyHandler implements DeviceKeyHandler {
     WakeLock mGestureWakeLock;
     private int mProximityTimeOut;
     private boolean mProximityWakeSupported;
+    private boolean mNotificationSliderVibrate;
 
     public KeyHandler(Context context) {
         mContext = context;
@@ -214,6 +222,22 @@ public class KeyHandler implements DeviceKeyHandler {
             case GESTURE_GTR_SCANCODE:
                 dispatchMediaKeyWithWakeLockToMediaSession(KeyEvent.KEYCODE_MEDIA_NEXT);
                 doHapticFeedback();
+                break;
+            case MODE_MUTE:
+            case MODE_DO_NOT_DISTURB:
+            case MODE_NORMAL:
+                int zenMode = Global.ZEN_MODE_OFF;
+                if (msg.arg1 == MODE_MUTE) {
+                    zenMode = Global.ZEN_MODE_NO_INTERRUPTIONS;
+                } else if (msg.arg1 == MODE_DO_NOT_DISTURB) {
+                    zenMode = Global.ZEN_MODE_IMPORTANT_INTERRUPTIONS;
+                }
+                Global.putInt(mContext.getContentResolver(), Global.ZEN_MODE,
+                        zenMode);
+                if (mNotificationSliderVibrate) {
+                    doHapticFeedback();
+                }
+                mNotificationSliderVibrate = true;
                 break;
             }
         }
