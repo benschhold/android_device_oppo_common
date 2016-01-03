@@ -18,6 +18,7 @@ package com.cyanogenmod.settings.device;
 
 import android.app.ActivityManagerNative;
 import android.app.KeyguardManager;
+import android.app.NotificationManager;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -104,6 +105,7 @@ public class KeyHandler implements DeviceKeyHandler {
     private int mProximityTimeOut;
     private boolean mProximityWakeSupported;
     private boolean mNotificationSliderVibrate;
+    private NotificationManager mNotificationManager;
 
     public KeyHandler(Context context) {
         mContext = context;
@@ -132,6 +134,9 @@ public class KeyHandler implements DeviceKeyHandler {
 
         mCameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
         mCameraManager.registerTorchCallback(new MyTorchCallback(), mEventHandler);
+
+        mNotificationManager = (NotificationManager)
+                mContext.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     private class MyTorchCallback extends CameraManager.TorchCallback {
@@ -232,8 +237,7 @@ public class KeyHandler implements DeviceKeyHandler {
                 } else if (msg.arg1 == MODE_DO_NOT_DISTURB) {
                     zenMode = Global.ZEN_MODE_IMPORTANT_INTERRUPTIONS;
                 }
-                Global.putInt(mContext.getContentResolver(), Global.ZEN_MODE,
-                        zenMode);
+                mNotificationManager.setZenMode(zenMode, null, null);
                 if (mNotificationSliderVibrate) {
                     doHapticFeedback();
                 }
