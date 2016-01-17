@@ -48,6 +48,7 @@ import android.provider.Settings.Global;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.WindowManagerGlobal;
+import android.widget.Toast;
 
 import cyanogenmod.providers.CMSettings;
 
@@ -106,6 +107,7 @@ public class KeyHandler implements DeviceKeyHandler {
     private boolean mProximityWakeSupported;
     private boolean mNotificationSliderVibrate;
     private NotificationManager mNotificationManager;
+    private Toast mZenToast;
 
     public KeyHandler(Context context) {
         mContext = context;
@@ -232,10 +234,24 @@ public class KeyHandler implements DeviceKeyHandler {
             case MODE_DO_NOT_DISTURB:
             case MODE_NORMAL:
                 int zenMode = Global.ZEN_MODE_OFF;
-                if (msg.arg1 == MODE_MUTE) {
+                String message = null;
+                if (mZenToast != null) {
+                    mZenToast.cancel();
+                }
+                if (msg.arg1 == MODE_NORMAL) {
+                    message = mContext.getString(com.android.internal.R.
+                            string.zen_mode_normal_toast);
+                    mZenToast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+                } else if (msg.arg1 == MODE_MUTE) {
                     zenMode = Global.ZEN_MODE_NO_INTERRUPTIONS;
+                    message = mContext.getString(com.android.internal.R.
+                            string.zen_mode_no_interruptions_toast);
+                    mZenToast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
                 } else if (msg.arg1 == MODE_DO_NOT_DISTURB) {
                     zenMode = Global.ZEN_MODE_IMPORTANT_INTERRUPTIONS;
+                    message = mContext.getString(com.android.internal.R.
+                            string.zen_mode_important_interruptions_toast);
+                    mZenToast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
                 }
                 mNotificationManager.setZenMode(zenMode, null, null);
                 if (mNotificationSliderVibrate) {
