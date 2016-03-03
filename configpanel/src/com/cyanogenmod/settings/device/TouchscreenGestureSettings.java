@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The CyanogenMod Project
+ * Copyright (C) 2015-2016 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.cyanogenmod.settings.device.utils.Constants;
 import com.cyanogenmod.settings.device.utils.FileUtils;
 import com.cyanogenmod.settings.device.utils.NodePreferenceActivity;
 
+import cyanogenmod.providers.CMSettings;
 import org.cyanogenmod.internal.util.ScreenType;
 
 import android.os.Bundle;
@@ -81,7 +82,8 @@ public class TouchscreenGestureSettings extends NodePreferenceActivity {
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if (preference == mHapticFeedback) {
             final boolean value = (Boolean) newValue;
-            Settings.System.putInt(getContentResolver(), KEY_HAPTIC_FEEDBACK, value ? 1 : 0);
+            CMSettings.System.putInt(getContentResolver(),
+                    CMSettings.System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, value ? 1 : 0);
             return true;
         }
 
@@ -113,7 +115,7 @@ public class TouchscreenGestureSettings extends NodePreferenceActivity {
             getListView().setPadding(0, 0, 0, 0);
         }
 
-        mHapticFeedback.setChecked(
-                Settings.System.getInt(getContentResolver(), KEY_HAPTIC_FEEDBACK, 1) != 0);
+        mHapticFeedback.setChecked(CMSettings.System.getInt(getContentResolver(),
+                CMSettings.System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, 1) != 0);
     }
 }
